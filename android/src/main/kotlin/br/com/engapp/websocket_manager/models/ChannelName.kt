@@ -4,6 +4,7 @@ class ChannelName {
     companion object {
         const val PLUGIN_NAME = "websocket_manager"
         const val MESSAGE = "websocket_manager/message"
+		const val CONNECTED = "websocket_manager/connected"
         const val DONE = "websocket_manager/done"
     }
 }

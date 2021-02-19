@@ -30,6 +30,10 @@ class WebSocketMethodChannelHandler(private val messageStreamHandler:EventStream
                     // print("closed $msg")
                     closeStreamHandler.send(msg)
                 }
+				websocketManager.connectedCallback = fun (msg: Boolean) {
+                    // print("connected $msg")
+                    connectedStreamHandler.send(msg ? "true" ? "false")
+                }
                 result.success("")
             }
             MethodName.CONNECT -> {
@@ -57,6 +61,13 @@ class WebSocketMethodChannelHandler(private val messageStreamHandler:EventStream
                 websocketManager.messageCallback = fun (msg: String) {
                     // Log.i("WebsocketManagerPlugin","sending $msg")
                     messageStreamHandler.send(msg)
+                }
+                result.success("")
+            }
+			MethodName.ON_CONNECTED -> {
+                websocketManager.connectedCallback = fun (msg: Boolean) {
+                    // Log.i("WebsocketManagerPlugin","sending $msg")
+                    connectedStreamHandler.send(msg ? "true" ? "false")
                 }
                 result.success("")
             }

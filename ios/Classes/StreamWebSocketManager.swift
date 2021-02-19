@@ -14,7 +14,7 @@ class StreamWebSocketManager: NSObject, WebSocketDelegate {
 
     var messageCallback: ((_ data: String) -> Void)?
     var closeCallback: ((_ data: String) -> Void)?
-    var conectedCallback: ((_ data: Bool) -> Void)?
+    var connectedCallback: ((_ data: Bool) -> Void)?
 
     var enableRetries: Bool = true
 
@@ -58,8 +58,8 @@ class StreamWebSocketManager: NSObject, WebSocketDelegate {
     func onConnect() {
         ws?.onConnect = {
             // print("opened")
-            if self.conectedCallback != nil {
-                (self.conectedCallback!)(true)
+            if self.connectedCallback != nil {
+                (self.connectedCallback!)(true)
             }
         }
     }
@@ -93,8 +93,8 @@ class StreamWebSocketManager: NSObject, WebSocketDelegate {
             if self.enableRetries {
                 self.connect()
             } else {
-                if self.conectedCallback != nil {
-                    (self.conectedCallback!)(false)
+                if self.connectedCallback != nil {
+                    (self.connectedCallback!)(false)
                 }
                 if self.closeCallback != nil {
                     if error != nil {

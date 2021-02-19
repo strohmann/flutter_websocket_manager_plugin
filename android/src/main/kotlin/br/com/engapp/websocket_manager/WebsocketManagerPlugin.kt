@@ -16,8 +16,10 @@ class WebsocketManagerPlugin: FlutterPlugin {
   private var methodChannel: MethodChannel? = null
 
   private var messageChannel: EventChannel? = null
+  private var connectedChannel: EventChannel? = null
   private var doneChannel: EventChannel? = null
   private val messageStreamHandler = EventStreamHandler(this::onListenMessageCallback, this::onCancelCallback)
+  private val connectedStreamHandler = EventStreamHandler(this::onListenConnectedCallback, this::onCancelCallback)
   private val closeStreamHandler = EventStreamHandler(this::onListenCloseCallback, this::onCancelCallback)
 
   /** Plugin registration.  */
@@ -45,6 +47,8 @@ class WebsocketManagerPlugin: FlutterPlugin {
 
     messageChannel = EventChannel(messenger, ChannelName.MESSAGE)
     messageChannel!!.setStreamHandler(messageStreamHandler)
+	connectedChannel = EventChannel(messenger, ChannelName.CONNECTED)
+    connectedChannel!!.setStreamHandler(connectedStreamHandler)
     doneChannel = EventChannel(messenger, ChannelName.DONE)
     doneChannel!!.setStreamHandler(closeStreamHandler)
   }
@@ -52,6 +56,7 @@ class WebsocketManagerPlugin: FlutterPlugin {
   private fun teardownChannels() {
     methodChannel?.setMethodCallHandler(null)
     messageChannel?.setStreamHandler(null)
+	connectedChannel?.setStreamHandler(null)
     doneChannel?.setStreamHandler(null)
     methodChannel = null
     messageChannel = null
@@ -60,6 +65,9 @@ class WebsocketManagerPlugin: FlutterPlugin {
 
   private fun onListenMessageCallback(){
     methodChannel?.invokeMethod(MethodName.LISTEN_MESSAGE,null)
+  }
+  private fun onListenConnectedCallback(){
+    connectedChannel?.invokeMethod(MethodName.LISTEN_CONNECTED,null)
   }
   private fun onListenCloseCallback(){
     methodChannel?.invokeMethod(MethodName.LISTEN_CLOSE,null)

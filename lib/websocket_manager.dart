@@ -4,11 +4,13 @@ import 'package:flutter/services.dart';
 
 const String _PLUGIN_NAME = 'websocket_manager';
 const String _EVENT_CHANNEL_MESSAGE = 'websocket_manager/message';
+const String _EVENT_CHANNEL_CONNECTED = 'websocket_manager/connected';
 const String _EVENT_CHANNEL_DONE = '$_PLUGIN_NAME/done';
 const String _METHOD_CHANNEL_CREATE = 'create';
 const String _METHOD_CHANNEL_CONNECT = 'connect';
 const String _METHOD_CHANNEL_DISCONNECT = 'disconnect';
 const String _METHOD_CHANNEL_ON_MESSAGE = 'onMessage';
+const String _METHOD_CHANNEL_ON_CONNECTED = 'onConnected';
 const String _METHOD_CHANNEL_ON_DONE = 'onDone';
 const String _METHOD_CHANNEL_SEND = 'send';
 const String _METHOD_CHANNEL_TEST_ECHO = 'echoTest';
@@ -25,19 +27,24 @@ class WebsocketManager {
   static const MethodChannel _channel = MethodChannel(_PLUGIN_NAME);
   static const EventChannel _eventChannelMessage =
       EventChannel(_EVENT_CHANNEL_MESSAGE);
+  static const EventChannel _eventChannelConnected =
+      EventChannel(_EVENT_CHANNEL_CONNECTED);
   static const EventChannel _eventChannelClose =
       EventChannel(_EVENT_CHANNEL_DONE);
   static StreamSubscription<dynamic> _onMessageSubscription;
+  static StreamSubscription<dynamic> _onConnectedSubscription;
   static StreamSubscription<dynamic> _onCloseSubscription;
   static Stream<dynamic> _eventsMessage;
+  static Stream<dynamic> _eventsConnected;
   static Stream<dynamic> _eventsClose;
   static Function(dynamic) _messageCallback;
+  static Function(dynamic) _connectedCallback;
   static Function(dynamic) _closeCallback;
 
   static Future<void> echoTest() async {
     final dynamic result =
         await _channel.invokeMethod<dynamic>(_METHOD_CHANNEL_TEST_ECHO);
-    print(result);
+    //print(result);
   }
 
   Future<void> _create() async {
@@ -45,6 +52,9 @@ class WebsocketManager {
       switch (call.method) {
         case 'listen/message':
           _onMessage();
+          break;
+		case 'listen/connected':
+          _onConnected();
           break;
         case 'listen/close':
           _onClose();
@@ -60,6 +70,7 @@ class WebsocketManager {
       'header': header,
     });
     _onMessage();
+	_onConnected();
     _onClose();
   }
 
@@ -70,6 +81,7 @@ class WebsocketManager {
   /// to be able to listen data sent from the server and a done event.
   Future<void> connect() async {
     _onMessage();
+	_onConnected();
     await _channel.invokeMethod<dynamic>(_METHOD_CHANNEL_CONNECT);
   }
 
@@ -80,6 +92,10 @@ class WebsocketManager {
     if (_onMessageSubscription != null) {
       _onMessageSubscription.cancel();
       _onMessageSubscription = null;
+    }
+	if (_onConnectedSubscription != null) {
+      _onConnectedSubscription.cancel();
+      _onConnectedSubscription = null;
     }
 //    _eventsClose = null;
 //    if (_onCloseSubscription != null) {
@@ -107,6 +123,13 @@ class WebsocketManager {
     });
   }
 
+  void onConnected(Function(dynamic) callback) {
+    _connectedCallback = callback;
+    _startConnectedServices().then((_) {
+      _onConnected();
+    });
+  }
+
   /// Adds a callback handler to this WebSocket close event.
   ///
   /// If this WebSocket closes a done event is triggered, the [onClose] handler is
@@ -123,7 +146,6 @@ class WebsocketManager {
 
   Future<void> _startMessageServices() async {
     await _channel.invokeMethod<String>(_METHOD_CHANNEL_ON_MESSAGE);
-    return;
   }
 
   void _onMessage() {
@@ -134,9 +156,20 @@ class WebsocketManager {
     }
   }
 
+  Future<void> _startConnectedServices() async {
+    await _channel.invokeMethod<String>(_METHOD_CHANNEL_ON_CONNECTED);
+  }
+
+  void _onConnected() {
+    if (_eventsConnected == null) {
+      _eventsConnected =
+          _eventChannelConnected.receiveBroadcastStream().asBroadcastStream();
+      _onConnectedSubscription = _eventsConnected.listen(_connectedListener);
+    }
+  }
+
   Future<void> _startCloseServices() async {
     await _channel.invokeMethod<dynamic>(_METHOD_CHANNEL_ON_DONE);
-    return;
   }
 
   void _onClose() {
@@ -153,8 +186,15 @@ class WebsocketManager {
     }
   }
 
+  void _connectedListener(dynamic message) {
+    print('Received connected message: $message');
+    if (_connectedCallback != null) {
+      _connectedCallback(message.toString() == 'true');
+    }
+  }
+
   void _closeListener(dynamic message) {
-    print(message);
+    //print(message);
     if (_closeCallback != null) {
       _closeCallback(message);
     }

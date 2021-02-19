@@ -3,6 +3,7 @@ import UIKit
 
 enum ChannelName {
     static let onMessage: String = "websocket_manager/message"
+	static let onMessage: String = "websocket_manager/connected"
     static let onDone: String = "websocket_manager/done"
     static let status: String = "websocket_manager/status"
 }
@@ -10,6 +11,7 @@ enum ChannelName {
 @available(iOS 9.0, *)
 public class SwiftWebsocketManagerPlugin: NSObject, FlutterPlugin {
     let messageStreamHandler = EventStreamHandler()
+	let connectedStreamHandler = EventStreamHandler()
     let closeStreamHandler = EventStreamHandler()
     let statusStreamHandler = EventStreamHandler()
     let streamWebSocketManager = StreamWebSocketManager()
@@ -28,6 +30,8 @@ public class SwiftWebsocketManagerPlugin: NSObject, FlutterPlugin {
         // Stream setup
         FlutterEventChannel(name: ChannelName.onMessage, binaryMessenger: registrar.messenger())
             .setStreamHandler(messageStreamHandler)
+		FlutterEventChannel(name: ChannelName.onConnected, binaryMessenger: registrar.messenger())
+            .setStreamHandler(connectedStreamHandler)
         FlutterEventChannel(name: ChannelName.onDone, binaryMessenger: registrar.messenger())
             .setStreamHandler(closeStreamHandler)
         FlutterEventChannel(name: ChannelName.status, binaryMessenger: registrar.messenger())
@@ -84,6 +88,10 @@ public class SwiftWebsocketManagerPlugin: NSObject, FlutterPlugin {
             streamWebSocketManager.closeCallback = closeHandler
             streamWebSocketManager.onClose()
             result("")
+        } else if call.method == "onConnected" {
+            streamWebSocketManager.connectedCallback = connectedHandler
+            streamWebSocketManager.onConnected()
+            result("")
         }
     }
 
@@ -94,5 +102,10 @@ public class SwiftWebsocketManagerPlugin: NSObject, FlutterPlugin {
     func closeHandler(msg: String) {
         // print("closed \(msg)")
         closeStreamHandler.send(data: msg)
+    }
+
+	func connectedHandler(msg: String) {
+        print("connectedHandler \(msg)")
+        connectedStreamHandler.send(data: msg)
     }
 }

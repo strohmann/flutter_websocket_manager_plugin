@@ -24,7 +24,7 @@ class EventStreamHandler : NSObject, FlutterStreamHandler {
     
     func send(data: Any) {
         if let sink = self.sink {
-            print("sink \(data)")
+            //print("sink \(data)")
             sink(data)
         } else {
             print("sink is null")

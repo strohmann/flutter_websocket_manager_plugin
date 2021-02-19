@@ -7,9 +7,8 @@ import okio.ByteString
 import java.util.*
 
 
-class StreamWebSocketManager: WebSocketListener() {
-
-
+class StreamWebSocketManager: WebSocketListener()
+{
     private val uiThreadHandler: Handler = Handler(Looper.getMainLooper())
     private var ws: WebSocket? = null
     private val client = OkHttpClient()
@@ -19,7 +18,7 @@ class StreamWebSocketManager: WebSocketListener() {
 
     var messageCallback: ((String)->Unit)? = null
     var closeCallback: ((String)->Unit)? = null
-    var conectedCallback: ((Boolean)->Unit)? = null
+    var connectedCallback: ((Boolean)->Unit)? = null
     var openCallback: ((String)->Unit)? = null
 
     var enableRetries: Boolean = true
@@ -30,7 +29,7 @@ class StreamWebSocketManager: WebSocketListener() {
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
-        // Log.i("StreamWebSocketManager","onOpen")
+        Log.i("StreamWebSocketManager","onOpen")
         // Log.i("StreamWebSocketManager","is open callback null? ${openCallback == null}")
         if(openCallback != null) {
             uiThreadHandler.post {
@@ -131,11 +130,23 @@ class StreamWebSocketManager: WebSocketListener() {
         //  Log.i("StreamWebSocketManager","url: ${req.url}")
         ws = client.newWebSocket(req,this)
 //        client.dispatcher.executorService.shutdown()
+
+		if (connectedCallback != null) {
+            uiThreadHandler.post {
+                connectedCallback!!(true)
+            }
+        }
     }
 
     fun disconnect() {
         enableRetries = false
         ws?.close(1000,null)
+
+		if (connectedCallback != null) {
+            uiThreadHandler.post {
+                connectedCallback!!(false)
+            }
+        }
     }
 
     fun send(msg: String) {
