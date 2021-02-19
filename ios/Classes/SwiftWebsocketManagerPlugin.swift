@@ -3,7 +3,7 @@ import UIKit
 
 enum ChannelName {
     static let onMessage: String = "websocket_manager/message"
-	static let onMessage: String = "websocket_manager/connected"
+	static let onConnected: String = "websocket_manager/connected"
     static let onDone: String = "websocket_manager/done"
     static let status: String = "websocket_manager/status"
 }
