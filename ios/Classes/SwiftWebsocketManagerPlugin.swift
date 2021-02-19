@@ -90,7 +90,7 @@ public class SwiftWebsocketManagerPlugin: NSObject, FlutterPlugin {
             result("")
         } else if call.method == "onConnected" {
             streamWebSocketManager.connectedCallback = connectedHandler
-            streamWebSocketManager.onConnected()
+            streamWebSocketManager.onConnect()
             result("")
         }
     }
@@ -104,7 +104,7 @@ public class SwiftWebsocketManagerPlugin: NSObject, FlutterPlugin {
         closeStreamHandler.send(data: msg)
     }
 
-	func connectedHandler(msg: String) {
+	func connectedHandler(msg: Bool) {
         print("connectedHandler \(msg)")
         connectedStreamHandler.send(data: msg)
     }
