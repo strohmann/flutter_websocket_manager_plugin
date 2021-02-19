@@ -36,29 +36,35 @@ class _MyAppState extends State<MyApp> {
             ),
             Wrap(
               children: <Widget>[
-                RaisedButton(
-                  child: Text('CONFIG'),
-                  onPressed: () =>
-                      socket = WebsocketManager(_urlController.text),
+                ElevatedButton(
+                  child: const Text('CONFIG'),
+                  onPressed: ()
+				  {
+                    socket = WebsocketManager(_urlController.text);
+					socket.onConnected((dynamic isConnected)
+					{
+						print('isConnected: $isConnected');
+					});
+				  }
                 ),
-                RaisedButton(
-                  child: Text('CONNECT'),
+                ElevatedButton(
+                  child: const Text('CONNECT'),
                   onPressed: () {
                     if (socket != null) {
                       socket.connect();
                     }
                   },
                 ),
-                RaisedButton(
-                  child: Text('CLOSE'),
+                ElevatedButton(
+                  child: const Text('CLOSE'),
                   onPressed: () {
                     if (socket != null) {
                       socket.close();
                     }
                   },
                 ),
-                RaisedButton(
-                  child: Text('LISTEN MESSAGE'),
+                ElevatedButton(
+                  child: const Text('LISTEN MESSAGE'),
                   onPressed: () {
                     if (socket != null) {
                       socket.onMessage((dynamic message) {
@@ -70,8 +76,8 @@ class _MyAppState extends State<MyApp> {
                     }
                   },
                 ),
-                RaisedButton(
-                  child: Text('LISTEN DONE'),
+                ElevatedButton(
+                  child: const Text('LISTEN DONE'),
                   onPressed: () {
                     if (socket != null) {
                       socket.onClose((dynamic message) {
@@ -83,8 +89,8 @@ class _MyAppState extends State<MyApp> {
                     }
                   },
                 ),
-                RaisedButton(
-                  child: Text('ECHO TEST'),
+                ElevatedButton(
+                  child: const Text('ECHO TEST'),
                   onPressed: () => WebsocketManager.echoTest(),
                 ),
               ],
@@ -93,7 +99,7 @@ class _MyAppState extends State<MyApp> {
               controller: _messageController,
               decoration: InputDecoration(
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.send),
+                  icon: const Icon(Icons.send),
                   onPressed: () {
                     if (socket != null) {
                       socket.send(_messageController.text);
@@ -102,9 +108,9 @@ class _MyAppState extends State<MyApp> {
                 ),
               ),
             ),
-            Text('Received message:'),
+            const Text('Received message:'),
             Text(_message),
-            Text('Close message:'),
+            const Text('Close message:'),
             Text(_closeMessage),
           ],
         ),

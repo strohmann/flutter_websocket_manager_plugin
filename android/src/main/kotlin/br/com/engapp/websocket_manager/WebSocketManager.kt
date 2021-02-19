@@ -29,7 +29,7 @@ class StreamWebSocketManager: WebSocketListener()
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
-        Log.i("StreamWebSocketManager","onOpen")
+        //Log.i("StreamWebSocketManager","onOpen")
         // Log.i("StreamWebSocketManager","is open callback null? ${openCallback == null}")
         if(openCallback != null) {
             uiThreadHandler.post {

@@ -41,7 +41,7 @@ class WebsocketManagerPlugin: FlutterPlugin {
 
   private fun setupChannels(messenger: BinaryMessenger, context: Context) {
 
-    val websocketMethodChannel = WebSocketMethodChannelHandler(messageStreamHandler, closeStreamHandler)
+    val websocketMethodChannel = WebSocketMethodChannelHandler(messageStreamHandler, connectedStreamHandler, closeStreamHandler)
     methodChannel = MethodChannel(messenger, ChannelName.PLUGIN_NAME)
     methodChannel!!.setMethodCallHandler(websocketMethodChannel)
 
@@ -60,6 +60,7 @@ class WebsocketManagerPlugin: FlutterPlugin {
     doneChannel?.setStreamHandler(null)
     methodChannel = null
     messageChannel = null
+	connectedChannel = null
     doneChannel = null
   }
 
@@ -67,7 +68,7 @@ class WebsocketManagerPlugin: FlutterPlugin {
     methodChannel?.invokeMethod(MethodName.LISTEN_MESSAGE,null)
   }
   private fun onListenConnectedCallback(){
-    connectedChannel?.invokeMethod(MethodName.LISTEN_CONNECTED,null)
+    methodChannel?.invokeMethod(MethodName.LISTEN_CONNECTED,null)
   }
   private fun onListenCloseCallback(){
     methodChannel?.invokeMethod(MethodName.LISTEN_CLOSE,null)

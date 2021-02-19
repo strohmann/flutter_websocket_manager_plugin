@@ -32,7 +32,9 @@ class WebsocketManager {
   static const EventChannel _eventChannelClose =
       EventChannel(_EVENT_CHANNEL_DONE);
   static StreamSubscription<dynamic> _onMessageSubscription;
+  // ignore: unused_field, cancel_subscriptions
   static StreamSubscription<dynamic> _onConnectedSubscription;
+  // ignore: unused_field, cancel_subscriptions
   static StreamSubscription<dynamic> _onCloseSubscription;
   static Stream<dynamic> _eventsMessage;
   static Stream<dynamic> _eventsConnected;
@@ -42,8 +44,7 @@ class WebsocketManager {
   static Function(dynamic) _closeCallback;
 
   static Future<void> echoTest() async {
-    final dynamic result =
-        await _channel.invokeMethod<dynamic>(_METHOD_CHANNEL_TEST_ECHO);
+    await _channel.invokeMethod<dynamic>(_METHOD_CHANNEL_TEST_ECHO);
     //print(result);
   }
 
@@ -93,10 +94,10 @@ class WebsocketManager {
       _onMessageSubscription.cancel();
       _onMessageSubscription = null;
     }
-	if (_onConnectedSubscription != null) {
-      _onConnectedSubscription.cancel();
-      _onConnectedSubscription = null;
-    }
+	// if (_onConnectedSubscription != null) {
+    //   _onConnectedSubscription.cancel();
+    //   _onConnectedSubscription = null;
+    // }
 //    _eventsClose = null;
 //    if (_onCloseSubscription != null) {
 //      _onCloseSubscription.cancel();

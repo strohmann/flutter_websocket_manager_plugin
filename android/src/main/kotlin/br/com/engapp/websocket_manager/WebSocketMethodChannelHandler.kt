@@ -7,7 +7,9 @@ import io.flutter.plugin.common.MethodChannel
 
 
 class WebSocketMethodChannelHandler(private val messageStreamHandler:EventStreamHandler,
-        private val closeStreamHandler:EventStreamHandler) : MethodChannel.MethodCallHandler {
+	private val connectedStreamHandler:EventStreamHandler,
+    private val closeStreamHandler:EventStreamHandler) : MethodChannel.MethodCallHandler
+{
 
     private val websocketManager = StreamWebSocketManager()
 
@@ -32,7 +34,7 @@ class WebSocketMethodChannelHandler(private val messageStreamHandler:EventStream
                 }
 				websocketManager.connectedCallback = fun (msg: Boolean) {
                     // print("connected $msg")
-                    connectedStreamHandler.send(msg ? "true" ? "false")
+                    connectedStreamHandler.send(msg)
                 }
                 result.success("")
             }
@@ -67,7 +69,7 @@ class WebSocketMethodChannelHandler(private val messageStreamHandler:EventStream
 			MethodName.ON_CONNECTED -> {
                 websocketManager.connectedCallback = fun (msg: Boolean) {
                     // Log.i("WebsocketManagerPlugin","sending $msg")
-                    connectedStreamHandler.send(msg ? "true" ? "false")
+                    connectedStreamHandler.send(msg)
                 }
                 result.success("")
             }
